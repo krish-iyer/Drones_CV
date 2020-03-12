@@ -1,44 +1,29 @@
-import numpy as np
-import cv2 as cv
+import cv2
 
-frame = cv.imread("rgb.jpg")
+cam = cv2.VideoCapture(3)
 
-hsv = cv.cvtColor(frame, cv.COLOR_RGB2HSV)
+cv2.namedWindow("test")
 
+img_counter = 0
 
-h = hsv[:,:,0]
+while True:
+    ret, frame = cam.read()
+    cv2.imshow("test", frame)
+    if not ret:
+        break
+    k = cv2.waitKey(1)
 
-#h_th = np.where(h < 60,1,0)
+    if k%256 == 27:
+        # ESC pressed
+        print("Escape hit, closing...")
+        break
+    elif k%256 == 32:
+        # SPACE pressed
+        img_name = "opencv_frame_{}.png".format(img_counter)
+        cv2.imwrite(img_name, frame)
+        print("{} written!".format(img_name))
+        img_counter += 1
 
-green  = cv.inRange(h,60,80)
-red   = cv.inRange(h, 120, 150)  
-blue   = cv.inRange(h, 0, 10)  
+cam.release()
 
-ret, count = np.unique(green)
-
-row, col = np.where( green == 255)
-
-row_avg = np.median(row)
-col_avg = np.median(col)
-
-print(row_avg, col_avg)
-
-cv.imshow("green", green)
-cv.imshow("red", red)
-cv.imshow("blue", blue)
-
-#print(h_th)
-
-#print(s)
-
-
-# brightest = y.max()
-# threshold = brightest / 2
-
-# th = np.where(y>threshold,255,0)
-
-# cv.imshow("titl", th)
-
-# print(brightest)
-#print(frame[:,:,1])
-cv.waitKey(0)
+cv2.destroyAllWindows()
